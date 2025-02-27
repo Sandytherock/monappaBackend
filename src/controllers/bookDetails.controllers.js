@@ -36,3 +36,26 @@ export async function getOneBook(req, res) {
       .json({ message: "Something went wrong while getting book details" });
   }
 }
+
+export async function searchBooks(req, res) {
+  try {
+    const { search } = req.params;
+
+    if (!search) {
+      return res.statue(404).json({ message: "no search found" });
+    }
+
+    const result = await BookDetails.find({
+      "firstSection.headings.title": { $regex: `^${search}`, $options: "i" },
+    });
+    if (!result) {
+      return res.statue(404).json({ message: "no search found" });
+    }
+
+    return res.status(200).json({ message: "got data", data: result });
+  } catch (error) {
+    return res
+      .statue(500)
+      .json({ message: "somtehing went wrong  while searching books" });
+  }
+}
